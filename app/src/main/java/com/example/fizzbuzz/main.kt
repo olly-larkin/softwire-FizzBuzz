@@ -41,12 +41,24 @@ val funcMap = mapOf(
     17 to ::mod17Msg
 )
 
+/*
+    For user defined rules:
+        - Can't find details about executing console input
+        - Would have to define language to describe rules
+        - User enters number for rule and then "formula" for rule
+        - e.g. +:Boink;rev
+            - add the word Boink to the end and then reverse list
+        - Would be difficult to describe rule 13 using this method (adding into specific places)
+        - Users would not be able to define rules that were not conceived by the programmer
+            - Limited by created language
+ */
+
 fun main() {
 
     print("Please enter the max number: ")
     val maxNum = readLine()!!.toInt()
 
-    print("Enter rules that should be used: ")
+    print("Enter list of rules that should be used (space separated): ")
     val rules = readLine()!!.split(' ').map{if (it != "") it.toInt() else 0}
 
     val output = mutableListOf<String>()
