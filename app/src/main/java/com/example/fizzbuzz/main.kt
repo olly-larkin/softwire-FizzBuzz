@@ -1,57 +1,63 @@
 package com.example.fizzbuzz
 
-fun mod3Msg(list: MutableList<String>) {
-    list.add("Fizz")
-}
-
-fun mod5Msg(list: MutableList<String>) {
-    list.add("Buzz")
-}
-
-fun mod7Msg(list: MutableList<String>) {
-    list.add("Bang")
-}
-
-fun mod11Msg(list: MutableList<String>) {
-    list.clear()
-    list.add("Bong")
-}
-
-fun mod13Msg(list: MutableList<String>) {
-    val addIn = "Fezz"
-    val idx = list.indexOfFirst{s -> s[0] == 'b' || s[0] == 'B'}
-
-    if (idx == -1)
-        list.add(addIn)
-    else
-        list.add(idx, addIn)
-}
-
-// Assumed that a number should be printed if there are no words added by other functions
-fun mod17Msg(list: MutableList<String>) {
-    if (list.isNotEmpty()) list.reverse()
-}
-
-val funcMap = mapOf(
-    3 to ::mod3Msg,
-    5 to ::mod5Msg,
-    7 to ::mod7Msg,
-    11 to ::mod11Msg,
-    13 to ::mod13Msg,
-    17 to ::mod17Msg
-)
-
 /*
     For user defined rules:
         - Can't find details about executing console input
         - Would have to define language to describe rules
         - User enters number for rule and then "formula" for rule
         - e.g. +:Boink;rev
-            - add the word Boink to the end and then reverse list
-        - Would be difficult to describe rule 13 using this method (adding into specific places)
+            - Add the word Boink to the end and then reverse list
         - Users would not be able to define rules that were not conceived by the programmer
             - Limited by created language
- */
+
+        +       -       add                 -       (word)
+        +?      -       conditional add     -       (word, regex match condition)
+        clr     -       empty list          -       no args
+        rev     -       reverse list        -       no args
+*/
+
+fun addFunc(list: MutableList<String>, word: String) {
+    list.add(word)
+}
+
+fun addCondFunc(list: MutableList<String>, word: String, cond: String) {
+    val reg = Regex(cond)
+    val idx = list.indexOfFirst { reg.matches(it) }
+
+    if (idx == -1)
+        list.add(word)
+    else
+        list.add(idx, word)
+}
+
+fun clrFunc(list: MutableList<String>) {
+    if (list.isNotEmpty()) list.clear()
+}
+
+fun revFunc(list: MutableList<String>) {
+    if (list.isNotEmpty()) list.reverse()
+}
+
+fun executeRule(list: MutableList<String>, ruleStr: String) {
+    val rules: List<List<String>> = ruleStr.split(';').map { it.split(':') }
+    for (rule in rules) {
+        when (rule[0]) {
+            "+" -> addFunc(list, rule[1])
+            "+?" -> addCondFunc(list, rule[1], rule[2])
+            "clr" -> clrFunc(list)
+            "rev" -> revFunc(list)
+        }
+    }
+}
+
+val ruleMap = mutableMapOf(
+    3 to "+:Fizz",
+    5 to "+:Buzz",
+    7 to "+:Bang",
+    11 to "clr;+:Bong",
+    13 to "+?:Fezz:(b|B).*",
+    17 to "rev"
+)
 
 fun main() {
 
@@ -61,11 +67,20 @@ fun main() {
     print("Enter list of rules that should be used (space separated): ")
     val rules = readLine()!!.split(' ').map{if (it != "") it.toInt() else 0}
 
+    println("Enter custom rules ([number]~[rule]) and end with EOF")
+    var rule: List<String>?
+    do {
+        rule = readLine()?.split("~")
+        if (rule != null) {
+            ruleMap.put(rule[0].toInt(), rule[1])
+        }
+    } while (rule != null)
+
     val output = mutableListOf<String>()
     for (i in 1..maxNum) {
         val list = mutableListOf<String>()
-        for (key in funcMap.keys) {
-            if (i % key == 0 && rules.contains(key)) funcMap[key]?.invoke(list)
+        for (key in ruleMap.keys) {
+            if (i % key == 0 && rules.contains(key)) executeRule(list, ruleMap.getValue(key))
         }
         if (list.isEmpty())
             output.add("$i")
