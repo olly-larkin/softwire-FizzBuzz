@@ -47,7 +47,7 @@ fun main() {
     val maxNum = readLine()!!.toInt()
 
     print("Enter rules that should be used: ")
-    val rules = readLine()!!.split(' ').map(String::toInt)
+    val rules = readLine()!!.split(' ').map{if (it != "") it.toInt() else 0}
 
     val output = mutableListOf<String>()
     for (i in 1..maxNum) {
