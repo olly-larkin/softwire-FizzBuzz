@@ -42,11 +42,18 @@ val funcMap = mapOf(
 )
 
 fun main() {
+
+    print("Please enter the max number: ")
+    val maxNum = readLine()!!.toInt()
+
+    print("Enter rules that should be used: ")
+    val rules = readLine()!!.split(' ').map(String::toInt)
+
     val output = mutableListOf<String>()
-    for (i in 1..1000) {
+    for (i in 1..maxNum) {
         val list = mutableListOf<String>()
         for (key in funcMap.keys) {
-            if (i % key == 0) funcMap[key]?.invoke(list)
+            if (i % key == 0 && rules.contains(key)) funcMap[key]?.invoke(list)
         }
         if (list.isEmpty())
             output.add("$i")
