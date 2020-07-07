@@ -72,14 +72,14 @@ fun main() {
     do {
         rule = readLine()?.split("~")
         if (rule != null) {
-            ruleMap.put(rule[0].toInt(), rule[1])
+            ruleMap[rule[0].toInt()] = rule[1]
         }
     } while (rule != null)
 
     val output = mutableListOf<String>()
     for (i in 1..maxNum) {
         val list = mutableListOf<String>()
-        for (key in ruleMap.keys) {
+        for (key in ruleMap.keys.sorted()) {
             if (i % key == 0 && rules.contains(key)) executeRule(list, ruleMap.getValue(key))
         }
         if (list.isEmpty())
